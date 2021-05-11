@@ -47,7 +47,7 @@ def collect_user_history(db):
         },
         {
             '$group':{
-                '_id': {'user' : '$userdata.username'},
+                '_id': {'user' : '$userdata._id'},
                 'contents' : {'$addToSet' : '$contentdata.des'}
             }
         }
@@ -67,9 +67,9 @@ def find_most_similar_contents(conts , uw,model=model,k=15):
     conts = [(c['_id'] , sum([model.get_vector(w) for w in c['des'] if w in model])) for c in conts]
     l = [] 
     for u in uw:
-        candid = [c[0] for c in 
+        candid = [str(c[0]) for c in 
         sorted(conts , key=lambda x : np.dot(uw[u] , x[1])/(np.linalg.norm(uw[u])*np.linalg.norm(x[1])) , reverse=True)[-k:]]
-        l.append({'userID' : u , 'suggestions' : candid})
+        l.append({'userID' : str(u) , 'suggestions' : candid})
     return l
 
 
