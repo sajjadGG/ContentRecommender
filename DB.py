@@ -1,6 +1,5 @@
 from pymongo import MongoClient
 
-
 def get_db():
     with open('.config' , 'r') as f:
         l = f.readline()

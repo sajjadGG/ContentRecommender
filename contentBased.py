@@ -2,6 +2,7 @@ from gensim.test.utils import datapath, get_tmpfile
 from gensim.models import KeyedVectors
 from gensim.scripts.glove2word2vec import glove2word2vec
 from datetime import datetime , timedelta
+import numpy as np
 from DB import get_db
 #TODO : read from conf
 GLOVE_FILE = 'C:\\Dev\\RecommenderSystem\\w2v\\'
@@ -12,8 +13,7 @@ glove2word2vec(glove_file, word2vec_glove_file)
 model = KeyedVectors.load_word2vec_format(word2vec_glove_file)
 print(model.most_similar('obama'))
 
-def collect_user_history():
-    db = get_db()
+def collect_user_history(db):
     #TODO : make query more efficient
     c = db.userhistories.aggregate([
         {
@@ -58,11 +58,18 @@ def user_history_to_vector(c , model = model):
     u = {}
     for k in c:
         user = k['_id']['user']
-        contents = l['contents']
+        contents = k['contents']
         #TODO : preprocess contents 
-        return sum([model.get_vector(w) for s in contents for w in s.split() if w in model])
-        
+        u[user] = sum([model.get_vector(w) for s in contents for w in s.split() if w in model])
+    return u
+#TODO :  make process more cpu and memory effiecent
+def find_most_similar_contents(conts , uw,model=model,k=15):
+    conts = [(c['_id'] , sum([model.get_vector(w) for w in c['des'] if w in model])) for c in conts]
+    l = [] 
+    for u in uw:
+        candid = [c[0] for c in 
+        sorted(conts , key=lambda x : np.dot(uw[u] , x[1])/(np.linalg.norm(uw[u])*np.linalg.norm(x[1])) , reverse=True)[-k:]]
+        l.append({'userID' : u , 'suggestions' : candid})
+    return l
 
-def find_most_similar_contents():
-    pass
 

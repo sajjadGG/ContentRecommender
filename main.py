@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from datetime import datetime , timedelta
+from contentBased import *
 with open('.config' , 'r') as f:
     l = f.readline()
     mongo_token = l.split(':=')[-1]
@@ -9,40 +10,8 @@ client = MongoClient(mongo_token , serverSelectionTimeoutMS=360000)
 db = client['myFirstDatabase']
 print(db.list_collection_names())
 
-c = db.userhistories.aggregate([
-        {
-            '$match' : {
-                'createdAt' : {
-                    '$gt' : datetime.now() - timedelta(days=3)
-                }
-            }
-        },
-        {
-            '$lookup' : {
-                'from' : 'users',
-                'localField' : 'user',
-                'foreignField' : '_id',
-                'as' : 'userdata'
-            }
-        },
-        {
-        "$unwind": "$userdata"
-        },
-        {
-            '$lookup' : {
-                'from' : 'contents',
-                'localField' : 'content',
-                'foreignField' : '_id',
-                'as' : 'contentdata'
-            }
-        },
-        {
-        "$unwind": "$contentdata"
-        },
-        {
-            '$group':{
-                '_id': {'user' : '$userdata.username'},
-                'contents' : {'$addToSet' : '$contentdata.des'}
-            }
-        }
-    ])    
+c = list(collect_user_history(db))
+print(len(c))
+uw = user_history_to_vector(c)
+suggests = find_most_similar_contents(list(db.contents.find()) , uw)
+
