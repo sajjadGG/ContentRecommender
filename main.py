@@ -2,12 +2,15 @@ from pymongo import MongoClient
 from datetime import datetime , timedelta
 import requests
 from contentBased import *
-
+import os
 API_ENDPOINT  = 'https://sharpsback.herokuapp.com/content/suggestions' 
-with open('.config' , 'r') as f:
-    l = f.readline()
-    mongo_token = l.split(':=')[-1]
-
+try:
+    with open('.config' , 'r') as f:
+        l = f.readline()
+        mongo_token = l.split(':=')[-1]
+except:
+    mongo_token = os.environ['MONGO_TOKEN']
+print("got : {}".format(mongo_token))
 # print(mongo_token)
 client = MongoClient(mongo_token , serverSelectionTimeoutMS=360000)
 db = client['myFirstDatabase']
