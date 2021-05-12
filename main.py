@@ -9,7 +9,9 @@ try:
         l = f.readline()
         mongo_token = l.split(':=')[-1]
 except:
-    mongo_token = os.environ['MONGOTOKEN']
+    with open('/run/secrets/mongo_token' , 'r') as f:
+        mongo_token = f.readline()
+    # mongo_token = os.environ['MONGOTOKEN']
 print("got : {}".format(mongo_token))
 # print(mongo_token)
 client = MongoClient(mongo_token , serverSelectionTimeoutMS=360000)
