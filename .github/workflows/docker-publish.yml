@@ -48,9 +48,7 @@ jobs:
 
       - name: Build image
         run: docker build . --file Dockerfile --build-arg MONGO_TOKEN=${{secrets.MONGO_TOKEN}} --tag $IMAGE_NAME
-        with:
-            context:
-              secrets: "mongo_token=${{secrets.MONGO_TOKEN}}"
+
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
