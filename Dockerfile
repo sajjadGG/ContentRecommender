@@ -1,4 +1,4 @@
-FROM python:3
+FROM alpine
 
 RUN --mount=type=secret,id=mongo_token \
   cat /run/secrets/mongo_token
