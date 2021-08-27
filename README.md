@@ -1,7 +1,7 @@
 # ContentRecommender
 Recommender Engine to Suggest relevant content to each user
 
-Modules in this Recommender System are asfollows : 
+Modules in this Recommender System are as follows : 
 - Collabrative 
 - Content Based
 
